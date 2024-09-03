@@ -8,8 +8,19 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 )
 
+// Esta aplicação faz cópia de arquivos entre buckets a partir de um container.
+// A cópia é disparada ao receber uma mensagem da fila SQS através de polling.
+// As mensagens são geradas a partir de um bucket S3 de origem, que esta configurado
+// para enviar eventos de criação de objetos para um tópico SNS.
+// No tópico SNS temos uma fila SQS registrada para receber os eventos e deixar
+// disponível para a aplicação consumir.
+//
+// A aplicação espera receber os seguintes parametros via variável de ambiente:
+//   - TARGET_BUCKET (bucket para copiar os arquivos recebidos)
+//   - QUEUE_URL     (URL da fila SQS para receber as mensagens)
+//   - WORKERS       (quantidade de mensagens em paralelo que será processado)
 func main() {
-	// identifica o bucket de destino para os arquivos recebidos, a fila sqs
+	// identifica o bucket de destino para os arquivos recebidos, a fila SQS
 	// e o total de processos em paralelo
 	targetBucket := os.Getenv("TARGET_BUCKET")
 	queueURL := os.Getenv("QUEUE_URL")
