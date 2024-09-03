@@ -110,6 +110,8 @@ func (p *mockS3WorkerClient) DeleteObject(ctx context.Context, params *s3.Delete
 	return nil, nil
 }
 
+// Testa a funcionalidade do worker comparando a saída com a saída
+// de uma execução com sucesso
 func TestWorker(t *testing.T) {
 	messages := make(chan *types.Message, 10)
 	buffer := &bytes.Buffer{}

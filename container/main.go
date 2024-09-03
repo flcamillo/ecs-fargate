@@ -43,12 +43,12 @@ func main() {
 	// inicia os workers
 	wg := sync.WaitGroup{}
 	for i := 0; i < workers; i++ {
-		worker := NewWorker(messages, targetBucket, queueURL, logOutput)
+		worker := NewWorker(messages, queueURL, targetBucket, logOutput)
 		wg.Add(1)
 		go func() {
 			err := worker.Start()
 			if err != nil {
-				log.Error("failed do start worker, %s", err)
+				log.Error("failed to start worker, %s", err)
 			}
 			wg.Done()
 		}()
@@ -59,7 +59,7 @@ func main() {
 	go func() {
 		err := consumer.Start()
 		if err != nil {
-			log.Error("failed do start consumer, %s", err)
+			log.Error("failed to start consumer, %s", err)
 		}
 		wg.Done()
 	}()

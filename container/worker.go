@@ -125,7 +125,7 @@ func (p *Worker) processCopy(event *events.S3EventRecord, remove bool) error {
 		_, err = p.s3Client.DeleteObject(
 			context.Background(),
 			&s3.DeleteObjectInput{
-				Bucket: &p.targetBucket,
+				Bucket: &event.S3.Bucket.Name,
 				Key:    &event.S3.Object.Key,
 			})
 		if err != nil {

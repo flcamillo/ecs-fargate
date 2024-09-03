@@ -7,6 +7,8 @@ import (
 	"testing"
 )
 
+// Testa a geração de mensagens de log informativas comparando a saída gerada
+// com a saída esperada
 func TestLogInfo(t *testing.T) {
 	input := "a b c"
 	correlation := "123456789"
@@ -21,6 +23,8 @@ func TestLogInfo(t *testing.T) {
 	}
 }
 
+// Testa a geração de mensagens de log de alerta comparando a saída gerada
+// com a saída esperada
 func TestLogWarning(t *testing.T) {
 	input := "a b c"
 	correlation := "123456789"
@@ -35,6 +39,8 @@ func TestLogWarning(t *testing.T) {
 	}
 }
 
+// Testa a geração de mensagens de log de erro comparando a saída gerada
+// com a saída esperada
 func TestLogError(t *testing.T) {
 	input := "a b c"
 	correlation := "123456789"

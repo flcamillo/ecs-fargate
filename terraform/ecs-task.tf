@@ -1,6 +1,6 @@
 # define o padrão de tasks que serão executadas
 resource "aws_ecs_task_definition" "task_definition" {
-  family                   = "service"
+  family                   = "${var.service_name}"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
@@ -20,7 +20,7 @@ resource "aws_ecs_task_definition" "task_definition" {
       essential = true
       environment = [
         {
-          name  = "BUCKET_FINAL"
+          name  = "TARGET_BUCKET"
           value = "${aws_s3_bucket.bucket_final.id}"
         },
         {
@@ -117,38 +117,6 @@ data "aws_iam_policy_document" "task_execution_policy_doc" {
       "ssm:GetParameters",
     ]
   }
-  statement {
-    sid       = "SQSConsumeMessages"
-    effect    = "Allow"
-    resources = [aws_sqs_queue.sqs.arn]
-    actions = [
-      "sqs:ReceiveMessage",
-      "sqs:DeleteMessage",
-      "sqs:GetQueueAttributes",
-    ]
-  }
-  statement {
-    sid    = "S3AccessSource"
-    effect = "Allow"
-    resources = [
-      aws_s3_bucket.bucket_source.arn,
-      "${aws_s3_bucket.bucket_source.arn}/*",
-    ]
-    actions = [
-      "s3:GetObject",
-    ]
-  }
-  statement {
-    sid    = "S3AccessFinal"
-    effect = "Allow"
-    resources = [
-      aws_s3_bucket.bucket_final.arn,
-      "${aws_s3_bucket.bucket_final.arn}/*",
-    ]
-    actions = [
-      "s3:PutObject",
-    ]
-  }
 }
 
 # cria a policy da lambda com os acessos definidos
@@ -206,6 +174,7 @@ data "aws_iam_policy_document" "task_policy_doc" {
     ]
     actions = [
       "s3:GetObject",
+      "s3:DeleteObject",
     ]
   }
   statement {

@@ -95,6 +95,9 @@ func (p *mockSQSConsumerClient) DeleteMessage(ctx context.Context, params *sqs.D
 	return nil, nil
 }
 
+// Testa o Consumer simulando a recepção de uma mensagem recebida da fila SQS.
+// A mensagem que for coletada do SQS deve chegar no channel de mensagens com
+// as informações que foram geradas do mock
 func TestConsumer(t *testing.T) {
 	messages := make(chan *types.Message, 10)
 	buffer := &bytes.Buffer{}
