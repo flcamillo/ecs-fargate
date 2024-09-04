@@ -99,7 +99,7 @@ func (p *mockSQSConsumerClient) DeleteMessage(ctx context.Context, params *sqs.D
 // A mensagem que for coletada do SQS deve chegar no channel de mensagens com
 // as informações que foram geradas do mock
 func TestConsumer(t *testing.T) {
-	messages := make(chan *types.Message, 10)
+	messages := make(chan *types.Message)
 	buffer := &bytes.Buffer{}
 	consumer := NewSQSConsumer(messages, "", buffer)
 	consumer.sqsClient = &mockSQSConsumerClient{}
@@ -120,5 +120,6 @@ func TestConsumer(t *testing.T) {
 		t.Fatal("message handle invalid")
 	}
 	consumer.Stop()
+	<-messages // descarta a mensagem que pode ter sido simulada novamente
 	wg.Wait()
 }

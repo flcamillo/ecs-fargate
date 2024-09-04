@@ -113,7 +113,7 @@ func (p *mockS3WorkerClient) DeleteObject(ctx context.Context, params *s3.Delete
 // Testa a funcionalidade do worker comparando a saída com a saída
 // de uma execução com sucesso
 func TestWorker(t *testing.T) {
-	messages := make(chan *types.Message, 10)
+	messages := make(chan *types.Message)
 	buffer := &bytes.Buffer{}
 	worker := NewWorker(messages, "", "abc", buffer)
 	worker.sqsClient = &mockSQSWorkerClient{}
@@ -130,10 +130,11 @@ func TestWorker(t *testing.T) {
 	m, _ := worker.sqsClient.ReceiveMessage(context.Background(), nil)
 	messages <- &m.Messages[0]
 	time.Sleep(5 * time.Second)
-	close(messages)
 	expectedOutput := "[INFO] {123} starting copy of {bucket-teste/teste.txt} to {abc/teste.txt}...\n"
 	expectedOutput += "[INFO] {123} copy of {bucket-teste/teste.txt} to {abc/teste.txt} completed successfully in {0 ms} rate {1024.00 bytes/s}\n"
 	if expectedOutput != buffer.String() {
 		t.Error("output not match")
 	}
+	worker.Stop()
+	wg.Wait()
 }

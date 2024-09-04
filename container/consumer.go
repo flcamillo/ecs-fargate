@@ -15,8 +15,6 @@ import (
 type SQSConsumer struct {
 	// Indica que o processo do consumidor foi encerrado
 	stopped bool
-	// Define um canal para aguardar o final do encerramento dos processos
-	cancel chan bool
 	// Canal para enviar as mensagens recebidas do SQS
 	messages chan<- *types.Message
 	// URL da fila SQS para excluir as mensagens processadas
@@ -32,7 +30,6 @@ func NewSQSConsumer(messages chan<- *types.Message, queueURL string, logOutput i
 	return &SQSConsumer{
 		messages: messages,
 		queueURL: queueURL,
-		cancel:   make(chan bool),
 		log: &Log{
 			o: logOutput,
 		},
@@ -67,12 +64,10 @@ func (p *SQSConsumer) Start() error {
 			p.messages <- &message
 		}
 	}
-	p.cancel <- true
 	return nil
 }
 
 // Encerra o consumo de mensagens
 func (p *SQSConsumer) Stop() {
 	p.stopped = true
-	<-p.cancel
 }

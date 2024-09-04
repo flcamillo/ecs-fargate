@@ -7,6 +7,16 @@ import (
 	"testing"
 )
 
+// Testa a configuração de correlation no log
+func TestLogCorrelation(t *testing.T) {
+	correlation := "123456789"
+	log := NewLog(nil)
+	log.SetCorrelation(correlation)
+	if log.Correlation() != correlation {
+		t.Error("invalid correlation")
+	}
+}
+
 // Testa a geração de mensagens de log informativas comparando a saída gerada
 // com a saída esperada
 func TestLogInfo(t *testing.T) {
@@ -19,7 +29,7 @@ func TestLogInfo(t *testing.T) {
 	log.Info(input)
 	output := buffer.String()
 	if !want.MatchString(output) {
-		t.Fatalf("output invalid, received {%s}", output)
+		t.Errorf("output invalid, received {%s}", output)
 	}
 }
 
@@ -35,7 +45,7 @@ func TestLogWarning(t *testing.T) {
 	log.Warning(input)
 	output := buffer.String()
 	if !want.MatchString(output) {
-		t.Fatalf("output invalid, received {%s}", output)
+		t.Errorf("output invalid, received {%s}", output)
 	}
 }
 
@@ -51,6 +61,6 @@ func TestLogError(t *testing.T) {
 	log.Error(input)
 	output := buffer.String()
 	if !want.MatchString(output) {
-		t.Fatalf("output invalid, received {%s}", output)
+		t.Errorf("output invalid, received {%s}", output)
 	}
 }

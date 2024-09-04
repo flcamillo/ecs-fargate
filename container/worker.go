@@ -16,6 +16,8 @@ import (
 
 // Define o processador de mensagens da fila SQS
 type Worker struct {
+	// Indica que o processo do consumidor foi encerrado
+	stopped bool
 	// Canal para receber as mensagens
 	messages <-chan *types.Message
 	// URL da fila SQS para excluir as mensagens processadas
@@ -54,19 +56,28 @@ func (p *Worker) Start() error {
 	if p.sqsClient == nil {
 		p.sqsClient = sqs.NewFromConfig(sdkConfig)
 	}
-	for {
-		message, ok := <-p.messages
-		if !ok {
-			break
+	for !p.stopped {
+		select {
+		case message, ok := <-p.messages:
+			if !ok {
+				break
+			}
+			p.log.SetCorrelation(*message.MessageId)
+			err := p.processMessage(message)
+			if err != nil {
+				p.log.Error("failed to process message, %s", err)
+			}
+			p.removeMessage(message)
+		case <-time.After(1 * time.Second):
+			continue
 		}
-		p.log.SetCorrelation(*message.MessageId)
-		err := p.processMessage(message)
-		if err != nil {
-			p.log.Error("failed to process message, %s", err)
-		}
-		p.removeMessage(message)
 	}
 	return nil
+}
+
+// Encerra o processamento das mensagens.
+func (p *Worker) Stop() {
+	p.stopped = true
 }
 
 // Processa a mensagem extraindo a mensagem SNS do corpo da mensagem SQS e
