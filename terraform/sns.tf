@@ -1,6 +1,9 @@
 # cria o topico sns
 resource "aws_sns_topic" "topic" {
   name = var.sns_name
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # define a política de acesso ao topico sns

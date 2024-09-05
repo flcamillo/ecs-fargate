@@ -5,6 +5,9 @@ resource "aws_ecr_repository" "ecr_go_app" {
   image_scanning_configuration {
     scan_on_push = true
   }
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # define a política de acesso ao repositório de imagens

@@ -1,6 +1,9 @@
 # cria o topico sqs
 resource "aws_sqs_queue" "sqs" {
   name = var.sns_name
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # define a política de acesso a fila sqs
@@ -35,6 +38,9 @@ resource "aws_sqs_queue" "sqs_dlq" {
     redrivePermission = "byQueue",
     sourceQueueArns   = [aws_sqs_queue.sqs.arn]
   })
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # associa a fila sqs a sua fila de mensagens mortas

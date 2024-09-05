@@ -1,6 +1,6 @@
 # define o padrão de tasks que serão executadas
 resource "aws_ecs_task_definition" "task_definition" {
-  family                   = "${var.service_name}"
+  family                   = var.service_name
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
@@ -39,12 +39,18 @@ resource "aws_ecs_task_definition" "task_definition" {
       }
     }
   ])
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # define o log group para a tarefa
 resource "aws_cloudwatch_log_group" "task_definition_log_group" {
   name              = "/ecs/${var.ecs_cluster_name}/${var.service_name}"
   retention_in_days = 7
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # define a política para a tarefa
@@ -125,6 +131,9 @@ resource "aws_iam_policy" "task_execution_policy" {
   policy      = data.aws_iam_policy_document.task_execution_policy_doc.json
   path        = "/"
   description = "Policy para a Task Definition do ECS"
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # define a trusted policy da tarefa
@@ -145,6 +154,9 @@ data "aws_iam_policy_document" "task_definition_trusted_policy_doc" {
 resource "aws_iam_role" "role_task_execution" {
   name               = "${var.ecs_cluster_name}_task_execution_role"
   assume_role_policy = data.aws_iam_policy_document.task_definition_trusted_policy_doc.json
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # associa a role com a policy
@@ -196,6 +208,9 @@ resource "aws_iam_policy" "task_policy" {
   policy      = data.aws_iam_policy_document.task_policy_doc.json
   path        = "/"
   description = "Policy para a Task Definition do ECS"
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # define a trusted policy da tarefa
@@ -216,6 +231,9 @@ data "aws_iam_policy_document" "task_trusted_policy_doc" {
 resource "aws_iam_role" "role_task" {
   name               = "${var.ecs_cluster_name}_task_role"
   assume_role_policy = data.aws_iam_policy_document.task_trusted_policy_doc.json
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # associa a role com a policy

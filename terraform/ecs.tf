@@ -2,6 +2,9 @@
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
   name              = "/ecs/${var.ecs_cluster_name}"
   retention_in_days = 7
+  tags = {
+    Project = "${var.project_name}"
+  }
 }
 
 # Define o cluster ECS
@@ -14,6 +17,9 @@ resource "aws_ecs_cluster" "ecs_cluster" {
         cloud_watch_log_group_name = aws_cloudwatch_log_group.ecs_log_group.name
       }
     }
+  }
+  tags = {
+    Project = "${var.project_name}"
   }
 }
 

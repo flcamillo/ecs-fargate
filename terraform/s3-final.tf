@@ -1,6 +1,9 @@
 # cria o bucket
 resource "aws_s3_bucket" "bucket_final" {
   bucket = "${data.aws_caller_identity.current.account_id}-${var.bucket_name}-final"
+  tags = {
+    Project = "${var.project_name}"
+  }  
 }
 
 # bloqueia o acesso publico ao bucket

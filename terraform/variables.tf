@@ -1,3 +1,33 @@
+variable "vpc_cidr" {
+  description = "Range de IP para criação da VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "project_name" {
+  description = "Nome do projeto"
+  type        = string
+  default     = "teste"
+}
+
+variable "zones" {
+  description = "Zonas de disponibilidade da AWS"
+  type        = list(string)
+  default     = ["sa-east-1a", "sa-east-1b", "sa-east-1c"]
+}
+
+variable "cidr_private" {
+  description = "Range de IP para criação subnet publica"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+}
+
+variable "cird_public" {
+  description = "Range de IP para criação subnet publica"
+  type        = list(string)
+  default     = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
+}
+
 variable "ecs_cluster_name" {
   description = "Nome do Cluster ECS"
   type        = string
