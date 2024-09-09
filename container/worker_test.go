@@ -110,6 +110,14 @@ func (p *mockS3WorkerClient) DeleteObject(ctx context.Context, params *s3.Delete
 	return nil, nil
 }
 
+// Implementa a função de obter dados do objeto, simula um retorno padrão
+func (p *mockS3WorkerClient) HeadObject(ctx context.Context, params *s3.HeadObjectInput, optFns ...func(*s3.Options)) (*s3.HeadObjectOutput, error) {
+	return &s3.HeadObjectOutput{
+		ContentLength: aws.Int64(1024),
+		Metadata:      map[string]string{},
+	}, nil
+}
+
 // Testa a funcionalidade do worker comparando a saída com a saída
 // de uma execução com sucesso
 func TestWorker(t *testing.T) {

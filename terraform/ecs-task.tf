@@ -185,7 +185,8 @@ data "aws_iam_policy_document" "task_policy_doc" {
       "${aws_s3_bucket.bucket_source.arn}/*",
     ]
     actions = [
-      "s3:GetObject",
+      "s3:List*",
+      "s3:Get*",
       "s3:DeleteObject",
     ]
   }
@@ -197,7 +198,7 @@ data "aws_iam_policy_document" "task_policy_doc" {
       "${aws_s3_bucket.bucket_final.arn}/*",
     ]
     actions = [
-      "s3:PutObject",
+      "s3:Put*",
     ]
   }
 }

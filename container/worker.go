@@ -102,18 +102,18 @@ func (p *Worker) processMessage(message *types.Message) error {
 	}
 	for _, record := range s3Event.Records {
 		start := time.Now()
-		p.log.Info("starting copy of {%s/%s} to {%s/%s}...", record.S3.Bucket.Name, record.S3.Object.Key, p.targetBucket, record.S3.Object.Key)
+		p.log.Info("starting copy of {%s/%s} to {%s/%s}...", record.S3.Bucket.Name, record.S3.Object.URLDecodedKey, p.targetBucket, record.S3.Object.URLDecodedKey)
 		err = p.processCopy(&record, true)
 		elapsed := time.Since(start)
 		if err != nil {
-			p.log.Error("copy of {%s/%s} to {%s/%s} failed, %s", record.S3.Bucket.Name, record.S3.Object.Key, p.targetBucket, record.S3.Object.Key, err)
+			p.log.Error("copy of {%s/%s} to {%s/%s} failed, %s", record.S3.Bucket.Name, record.S3.Object.URLDecodedKey, p.targetBucket, record.S3.Object.URLDecodedKey, err)
 			continue
 		}
 		rate := float64(record.S3.Object.Size)
 		if elapsed.Seconds() > 0 {
 			rate = float64(record.S3.Object.Size) / elapsed.Seconds()
 		}
-		p.log.Info("copy of {%s/%s} to {%s/%s} completed successfully in {%d ms} rate {%.2f bytes/s}", record.S3.Bucket.Name, record.S3.Object.Key, p.targetBucket, record.S3.Object.Key, elapsed.Microseconds(), rate)
+		p.log.Info("copy of {%s/%s} to {%s/%s} completed successfully in {%d ms} rate {%.2f bytes/s}", record.S3.Bucket.Name, record.S3.Object.URLDecodedKey, p.targetBucket, record.S3.Object.URLDecodedKey, elapsed.Microseconds(), rate)
 	}
 	return nil
 }
@@ -121,12 +121,12 @@ func (p *Worker) processMessage(message *types.Message) error {
 // Executa a cópia do arquivo do bucket original para o destino e faz a
 // exclusão do arquivo original após cópia com sucesso se solicitado.
 func (p *Worker) processCopy(event *events.S3EventRecord, remove bool) error {
-	sourceFile := fmt.Sprintf("%s/%s", event.S3.Bucket.Name, event.S3.Object.Key)
+	sourceFile := fmt.Sprintf("%s/%s", event.S3.Bucket.Name, event.S3.Object.URLDecodedKey)
 	_, err := p.s3Client.CopyObject(
 		context.Background(),
 		&s3.CopyObjectInput{
 			Bucket:     &p.targetBucket,
-			Key:        &event.S3.Object.Key,
+			Key:        &event.S3.Object.URLDecodedKey,
 			CopySource: &sourceFile,
 		})
 	if err != nil {
@@ -137,7 +137,7 @@ func (p *Worker) processCopy(event *events.S3EventRecord, remove bool) error {
 			context.Background(),
 			&s3.DeleteObjectInput{
 				Bucket: &event.S3.Bucket.Name,
-				Key:    &event.S3.Object.Key,
+				Key:    &event.S3.Object.URLDecodedKey,
 			})
 		if err != nil {
 			p.log.Warning("failed to delete source file, %s", err)
